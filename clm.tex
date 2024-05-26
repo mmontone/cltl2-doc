@@ -1,9 +1,8 @@
 \documentclass[12pt]{book}
 
-% !!! Эту комбинацию не менять
-\usepackage[T2A]{fontenc} % включаем русские шрифты
-\usepackage[utf8]{inputenc} % включаем поддержку UTF8
-\usepackage[russian,english]{babel} % включаем пакет для поддержки русского языка
+\usepackage[T2A]{fontenc} 
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
 
 \input commands.tex
 
@@ -15,12 +14,7 @@
   \def\include#1{\NextFile{#1.html}\oldinclude{#1}}
 \fi
 
-\ifx \rulang\Undef
-  \title{Common Lisp The Language, Second Edition}
-\else %RUSSIAN
-  \title{Язык Common Lisp, второе издание.}
-\fi
-
+\title{Common Lisp The Language, Second Edition}
 
 % !!!
 %%% Root file for Common Lisp Manual.  Copyright 1984, 1987 Guy L. Steele Jr.
@@ -43,7 +37,6 @@
 \pagestyle{headings}
 
 \usepackage{multind}
-
 \usepackage{color,graphicx}
 \usepackage{hyperref}
 \usepackage{multicol}
