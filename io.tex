@@ -26,24 +26,7 @@ or a \cd{PL/I} \cd{PUT EDIT} statement.  The most useful I/O operations,
 however, read and write printed representations of arbitrary
 Lisp objects.
 
-Common Lisp содержит богатый функционал для выполнения операций ввода/вывода.
-Все эти операции производятся на различного вида потоках.
-Данная глава посвящена тому, как оперировать данными в потоках.
-Потоки обсуждаются в главе~\ref{STREAM}, а способы работы с файлами
-через потоки в главе~\ref{FILES}.
-
-Большинство операций ввода/вывода в Common Lisp'е читают и записывают
-буквы, но также есть функции и для бинарных данных.  Есть
-простые примитивы для чтения и записи одного символа или строк
-данных. Функция \cdf{format} может выполнять сложное форматирование
-выходных данных, с помощью управляющей строки как в выражении
-\cdf{FORMAT} в Fortran'е или в \cd{PUT EDIT} в \cd{PL/I}.  Однако,
-самые полезные операции ввода/вывода читают и записывает выводимые
-представления произвольных Lisp'овых объектов.
-
 \section{Printed Representation of Lisp Objects}
-
-%\section{Строковое представление Lisp'овых объектов}
 
 Lisp objects in general are not text strings but complex data structures.
 They have very different properties from text strings as a consequence of
@@ -62,17 +45,6 @@ that does this is called the (Lisp) \emph{reader}.
 \indexterm{printed representation}
 \indexterm{reader}
 
-В общем случае Lisp'овые объекты являются не строками, а сложными структурами
-данных.  Как следствие их внутреннего представления, свойства этих объектов
-очень отличается от свойств строк. Однако, для того, чтобы можно было
-повествовать о Lisp'овых объектах, Lisp большинство объектов отображает в форме
-текста. Это называется \emph{строковое представление}, которое используется для
-ввода/вывода, а также в примерах в данной книге. Такие функции, как \cdf{print},
-принимают Lisp'овый объект и посылают строку представления
-в поток. Коллекция этих функций называется (Lisp'овым) \emph{принтером}. Функция
-\cdf{read} принимает буквы из потока, интерпретирует их как
-представление некоторого Lisp'ового объекта, создаёт этот объект и возвращает
-его. Коллекция этих функций называется (Lisp'овым) \emph{считывателем}.
 \indexterm{printer}
 \indexterm{printed representation}
 \indexterm{reader}
@@ -82,11 +54,6 @@ then read the printed representation back in, and so obtain the same identical
 object.  In practice this is difficult and for some purposes not even desirable.
 Instead, reading a printed representation produces an object that is (with
 obscure technical exceptions) \cdf{equal} to the originally printed object.
-
-В идеале, можно вывести Lisp'овый объект, а затем прочесть его обратно и
-получить идентичный первому объект. На практике это сделать сложнее, а в
-некоторых случаях это и не желательно. Вместо этого, считывание выводимого
-представления создаёт объект, который равен \cdf{equal} оригинальному объекту.
 
 Most Lisp objects have more than one possible printed representation.
 For example, the integer twenty-seven can be written in any of these ways:
@@ -104,48 +71,18 @@ The last example, which is spread over three lines, may be ugly, but it
 is legitimate.  In general, wherever whitespace is permissible in a printed
 representation, any number of spaces and newlines may appear.
 
-Большинство Lisp'овых объектов имеют более одного представления. Например, целое
-число двадцать семь может быть записано одним из способов:
-\begin{lisp}
-27~~~~27.~~~~\#o33~~~~\#x1B~~~~\#b11011~~~~\#.(* 3 3 3)~~~~81/3
-\end{lisp}
-Список двух символов \cdf{A} и \cdf{B} может быть записан в виде:
-\begin{lisp}
-~~~~(A B)~~~~(a b)~~~~(~~a~~b~)~~~~({\Xbackslash}A |B|) \\
-~~~~(|{\Xbackslash}A| \\
-~~B \\
-)
-\end{lisp}
-Последний пример, который занимает три строки, может и некрасив, но вполне
-законен. В общем случае, везде в представлении, где разрешены пробелы, может
-встречаться любое количество пробелов или знаков перевода строки.
-
 When \cdf{print} produces a printed representation, it must choose arbitrarily
 from among many possible printed representations.  It attempts to choose
 one that is readable.  There are a number of global variables that can
 be used to control the actions of \cdf{print}, and a number of different
 printing functions.
 
-Когда \cdf{print} выводит представление объекта, она должна произвольно выбрать
-одно из возможных представлений. Она пытается выбрать то, которое может быть
-прочитано считывателем. В Common Lisp'е представлено некоторое количество
-глобальных переменных, которые могут изменять поведение \cdf{print}, и некоторое
-количество различных функций для вывода.
-
 This section describes in detail what is the standard printed
 representation for any Lisp object and also describes how \cdf{read} operates.
-
-Этот раздел детально описывает, что является стандартным выводимым
-представлением для любого Lisp'ового объекта, и также описывает то, как работает
-\cdf{read}.
 
 \subsection{What the Read Function Accepts}
 \label{READER}
 \indexterm{reader}
-
-%\subsection{Что принимает функция read}
-%\label{READER}
-%\indexterm{reader}
 
 The purpose of the Lisp reader is to accept characters, interpret them
 as the printed representation of a Lisp object, and construct and
@@ -158,18 +95,6 @@ abbreviations for frequently used but unwieldy constructs.  The reader is
 also parameterized in such a way that it can be used as a lexical
 analyzer for a more general user-written parser.
 
-Целью Lisp'ового считывателя (ридера) является чтение строки,
-интерпретация как Lisp'ового объекта, создание и возврат этого
-объекта. Считыватель (ридер) не может прочесть все возможные
-выводимые представления объектов, например невозможно прочесть
-представление скомпилированного кода. Однако считыватель (ридер)
-содержит много таких возможностей, которые не используются при
-выводе. К ним относятся комментарии, альтернативные представления и
-удобные аббревиатуры для часто используемых, но тяжеловесных
-конструкций. Считыватель также может быть настроен так, чтобы
-использоваться в качестве лексического анализатора для более общих
-пользовательских парсеров.
-
 The reader is organized as a recursive-descent parser.
 Broadly speaking,
 the reader operates by reading a character from
@@ -180,15 +105,6 @@ to make a \emph{token}, which is then interpreted as a number or symbol.
 Macro characters trigger the invocation of functions (possibly
 user-supplied) that can perform arbitrary parsing actions,
 including recursive invocation of the reader.
-
-Считыватель выполнен как рекурсивный нисходящий парсер.  Проще говоря,
-считыватель считывает букву из входящего потока и обрабатывает его
-одним из трёх способов.  Пробельные буквы расцениваются как
-разделители, более одного игнорируются. Обычные и экранирующие буквы
-накапливаются и составляют \emph{токен}, которые затем интерпретирует как число
-или символ. Макросимволы запускают (вызывают) функцию (возможно
-пользовательскую), которая выполняет произвольный парсинг, которые может
-содержать рекурсивный вызов считывателя.
 
 More precisely,
 when the reader is invoked, it reads a single character from the input stream
@@ -212,24 +128,6 @@ Constituents additionally have one or more attributes,
 the most important of which is \emph{alphabetic}; these attributes are discussed
 further in section~\ref{PARSE-TOKENS-SECTION}.
 
-Более точное описание: когда вызывается считыватель, он читает один строковый
-символ из входящего потока и действует в зависимости от типа данного символа.
-Каждый символ, который может встретиться во входящем потоке должен принадлежать
-только определённым типам:
-\emph{некорректный},
-\emph{пробельный},
-\emph{обычный},
-\emph{одиночный экранирующий},
-\emph{много экранирующий}, or
-\emph{макросимвол}.
-Макросимволы в свою очередь делятся на \emph{терминальные} и
-\emph{нетерминальные}. (Следует отметить, что макросимволы не имеют ничего
-общего с макросами. Подобие заключается в том, что макросы позволяют расширить
-синтаксис Common Lisp'а на уровне форм, тогда как макросимволы позволяют
-расширить синтаксис на уровне букв.)
-Обычные символы имеют один или более атрибутов, наиболее важный из них это
-\emph{алфавитный}. Эти атрибуты описаны далее в разделе~\ref{PARSE-TOKENS-SECTION}.
-
 The parsing of Common Lisp expressions is discussed in terms of these
 syntactic character types because the types of individual characters
 are not fixed
@@ -249,20 +147,6 @@ The primary intent
 is that they be used as macro characters; but a user might choose,
 for example, to make \cd{!} be a \emph{single escape} character
 (as it is in Portable Standard Lisp).
-
-Парсинг Common Lisp'овых выражений описан в терминах типов синтаксических
-символов, так как типы отдельных символов не фиксированы и могут быть изменены
-пользователем (смотрите \cdf{set-syntax-from-char} и \cdf{set-macro-character}).
-Символы из стандартного множества имеют типы указанные в
-таблице~\ref{Standard-Character-Syntax-Table}.  Следует отметить, что
-квадратные, фигурные скобки, вопросительные знак и восклицательный знак (то
-есть, \cd{{\Xlbracket}}, \cd{{\Xrbracket}}, \cd{{\Xlbrace}}, \cd{{\Xrbrace}},
-\cd{?}, и \cd{!}) являются обычными символами, но они не используются в
-стандартном Common Lisp'е и не встречаются в именах системных функций и
-переменных.  Эти символы явно зарезервированы для нужд пользователя.  Главная
-цель в том, чтобы использовать эти символы в качестве макросимволов, но
-пользователь также может, например, сделать символ \cd{!} \emph{одиночным
-  экранирующим} символом (как в Portable Standard Lisp).
 
 \begin{table}
 \caption{Standard Character Syntax Types}
@@ -314,58 +198,8 @@ any other desired purpose.
 \end{small}
 \end{table}
 
-\begin{table}
-\caption{Стандартные типы символьного синтаксиса}
-\label{Standard-Character-Syntax-Table}
-
-\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}ll@{}}
-$\langle$tab$\rangle$\cd{~~}\emph{пробел}&$\langle$page$\rangle$\cd{~~}\emph{пробел}&$\langle$newline$\rangle$\cd{~~}\emph{пробел} \\
-$\langle$space$\rangle$\cd{~~}\emph{пробел}&\cd{{\Xatsign}~~}\emph{обычный}&\cd{{\Xbq}~~}\emph{терминальный макрос} \\
-\cd{!~~}\emph{обычный} *&\cd{A~~}\emph{обычный}&\cd{a~~}\emph{обычный} \\
-\cd{"~~}\emph{терминальный макрос}&\cd{B~~}\emph{обычный}&\cd{b~~}\emph{обычный} \\
-\cd{\#~~}\emph{не-терминальный макрос}&\cd{C~~}\emph{обычный}&\cd{c~~}\emph{обычный} \\
-\cd{\$~~}\emph{обычный}&\cd{D~~}\emph{обычный}&\cd{d~~}\emph{обычный} \\
-\cd{\%~~}\emph{обычный}&\cd{E~~}\emph{обычный}&\cd{e~~}\emph{обычный} \\
-\cd{\&~~}\emph{обычный}&\cd{F~~}\emph{обычный}&\cd{f~~}\emph{обычный} \\
-\cd{'~~}\emph{терминальный макрос}&\cd{G~~}\emph{обычный}&\cd{g~~}\emph{обычный} \\
-\cd{(~~}\emph{терминальный макрос}&\cd{H~~}\emph{обычный}&\cd{h~~}\emph{обычный} \\
-\cd{)~~}\emph{терминальный макрос}&\cd{I~~}\emph{обычный}&\cd{i~~}\emph{обычный} \\
-\cd{*~~}\emph{обычный}&\cd{J~~}\emph{обычный}&\cd{j~~}\emph{обычный} \\
-\cd{+~~}\emph{обычный}&\cd{K~~}\emph{обычный}&\cd{k~~}\emph{обычный} \\
-\cd{,~~}\emph{терминальный макрос}&\cd{L~~}\emph{обычный}&\cd{l~~}\emph{обычный} \\
-\cd{-~~}\emph{обычный}&\cd{M~~}\emph{обычный}&\cd{m~~}\emph{обычный} \\
-\cd{.~~}\emph{обычный}&\cd{N~~}\emph{обычный}&\cd{n~~}\emph{обычный} \\
-\cd{/~~}\emph{обычный}&\cd{O~~}\emph{обычный}&\cd{o~~}\emph{обычный} \\
-\cd{0~~}\emph{обычный}&\cd{P~~}\emph{обычный}&\cd{p~~}\emph{обычный} \\
-\cd{1~~}\emph{обычный}&\cd{Q~~}\emph{обычный}&\cd{q~~}\emph{обычный} \\
-\cd{2~~}\emph{обычный}&\cd{R~~}\emph{обычный}&\cd{r~~}\emph{обычный} \\
-\cd{3~~}\emph{обычный}&\cd{S~~}\emph{обычный}&\cd{s~~}\emph{обычный} \\
-\cd{4~~}\emph{обычный}&\cd{T~~}\emph{обычный}&\cd{t~~}\emph{обычный} \\
-\cd{5~~}\emph{обычный}&\cd{U~~}\emph{обычный}&\cd{u~~}\emph{обычный} \\
-\cd{6~~}\emph{обычный}&\cd{V~~}\emph{обычный}&\cd{v~~}\emph{обычный} \\
-\cd{7~~}\emph{обычный}&\cd{W~~}\emph{обычный}&\cd{w~~}\emph{обычный} \\
-\cd{8~~}\emph{обычный}&\cd{X~~}\emph{обычный}&\cd{x~~}\emph{обычный} \\
-\cd{9~~}\emph{обычный}&\cd{Y~~}\emph{обычный}&\cd{y~~}\emph{обычный} \\
-\cd{:~~}\emph{обычный}&\cd{Z~~}\emph{обычный}&\cd{z~~}\emph{обычный} \\
-\cd{;~~}\emph{терминальный макрос}&\cd{{\Xlbracket}~~}\emph{обычный} *&\cd{{\Xlbrace}~~}\emph{обычный} * \\
-\cd{<~~}\emph{обычный}&\cd{{\Xbackslash}~~}\emph{экранирующий один}&\cd{|~~}\emph{экранирующий много} \\
-\cd{=~~}\emph{обычный}&\cd{{\Xrbracket}~~}\emph{обычный} *&\cd{{\Xrbrace}~~}\emph{обычный} * \\
-\cd{>~~}\emph{обычный}&\cd{{\Xcircumflex}~~}\emph{обычный}&\cd{{\Xtilde}~~}\emph{обычный} \\
-\cd{?~~}\emph{обычный} *&\cd{{\Xunderscore}~~}\emph{обычный}&$\langle$rubout$\rangle$\cd{~~}\emph{обычный} \\
-$\langle$backspace$\rangle$\cd{~~}\emph{обычный}&$\langle$return$\rangle$\cd{~~}\emph{пробел}&$\langle$linefeed$\rangle$\cd{~~}\emph{пробел}
-\end{tabular*}
-\vfill
-\begin{small}
-\noindent
-Символы помеченные звездочкой первоначально являются составной частью, но
-зарезервированы для пользователя в качестве использования макросимволов или для
-других целей.
-\end{small}
-\end{table}
-
 The algorithm performed by the Common Lisp reader is roughly as follows:
 
-Алгоритм, выполняемый Common Lisp'овым считывателем, примерно такой:
 \begingroup\leftmargini 1.5em
 \begin{enumerate}
 \item
@@ -377,28 +211,13 @@ dispatch according to the syntactic type of \emph{x} to one
 of steps~\ref{READER-ILLEGAL} to~\ref{READER-CONSTITUENT}.
 \label{READER-START}
 
-\item Если достигнут конец файл, обработать эту ситуацию так как
-  указал вызвавший функцию \cdf{read}.  В противном случае, прочесть
-  один символ из входящего потока, назвать его \emph{x}, и обработать
-  в соответствии с синтаксическим типом \emph{x} одним из
-  способов~\ref{READER-ILLEGAL} или~\ref{READER-CONSTITUENT}.
-\label{READER-START}
-
 \item
 If \emph{x} is an \emph{illegal} character, signal an error.
-\label{READER-ILLEGAL}
-
-\item Если \emph{x} является \emph{некорректным} символом,
-  сигнализировать ошибку.
 \label{READER-ILLEGAL}
 
 \item
 If \emph{x} is a \emph{whitespace} character,
 then discard it and go back to step~\ref{READER-START}.
-\label{READER-WHITESPACE}
-
-\item Если \emph{x} является \emph{пробелом}, игнорировать его и
-  вернуться на шаг~\ref{READER-START}.
 \label{READER-WHITESPACE}
 
 \item
@@ -418,23 +237,6 @@ If one value is returned, then return that value as the result of the
 read operation; the algorithm is done.
 If zero values are returned, then go back to step~\ref{READER-START}.
 
-\item Если \emph{x} является \emph{макросимволом} (в данном случае
-  различие между \emph{терминальным} и \emph{нетерминальным})
-  макросимволами не имеет значения), тогда вызвать функцию связанную с
-  этим макросимволом. Функция может вернуть ноль или одно значение
-  (смотрите \cdf{values}).
-
-  Функция связанная с макросимволом, конечно, может считывать символы из
-  входящего потока, в этом случае она увидит символы, идущие после
-  данного макросимвола. Функция даже может рекурсивно вызвать
-  считыватель. Это например способ, которым создаётся список для
-  макросимвола \cd{(}: рекурсивным вызовом считывателя для каждого
-  элемента списка.
-
-  Если функция вернула одно значение, тогда это значение возвращается
-  в качестве результата операции чтения, алгоритм выполнен.  Если
-  функция не вернула значений, тогда приходит шаг~\ref{READER-START}.
-
 \item
 If \emph{x} is a \emph{single escape} character (normally \cd{{\Xbackslash}}),
 then read the next character and call it \emph{y}
@@ -447,25 +249,10 @@ For the purposes of \cdf{readtable-case}, \emph{y} is not replaceable.
 
 Use \emph{y} to begin a token, and go to step~\ref{READER-PLAIN-TOKEN}.
 
-\item Если \emph{x} является \emph{одиночным экранирующим символом}
-  (обычно это \cd{{\Xbackslash}}), тогда считать следующий символ и
-  называеть его \emph{y} (но если был конец файла, сигнализировать
-  ошибка). Игнорировать обычный синтаксис \emph{y}, и трактовать его
-  как \emph{обычный}, у которого только \emph{алфавитный} атрибут.
-
-  В целях использования \cdf{readtable-case}, \emph{y} является незамещаемым.
-  
-  Использовать \emph{y} для начала токена, и перейти к
-  шагу~\ref{READER-PLAIN-TOKEN}.
-
 \item
 If \emph{x} is a \emph{multiple escape} character (normally \cd{|}),
 then begin a token (initially
 containing no characters) and go to step~\ref{READER-MULTI-TOKEN}.
-
-\item Если \emph{x} является \emph{много экранирующим символом}
-  (обычно \cd{|}), тогда начать запись токена (первоначально нулевой
-  длины) и перейти к шагу~\ref{READER-MULTI-TOKEN}.
 
 \item
 If \emph{x} is a \emph{constituent} character, then it begins an extended token.
@@ -480,18 +267,6 @@ The case of \emph{x\/} should not be altered; instead,
 
 Use \emph{x} to begin a token, and go on to step~\ref{READER-PLAIN-TOKEN}.
 
-\item Если \emph{x} \emph{обычный} символ, тогда начать запись расширенного токена.
-\label{READER-CONSTITUENT}\relax
-После того как токен был считан, он будет интерпретирован как
-представление Lisp'ового объекта: или символа, или числа (в этом
-случае объект будет возвращён как результат функции чтения), или как
-некорректный синтаксис (в этом случае будет сигнализирована ошибка).
-
-Регистр символа \emph{x} не должен меняться, вместо этого \emph{x}
-помечается как замещаемый.
-
-Использовать \emph{x} для токена, и перейти к шагу~\ref{READER-PLAIN-TOKEN}.
-
 \item
 (At this point a token is being accumulated, and an even number
 of \emph{multiple escape} characters have been encountered.)
@@ -500,11 +275,6 @@ Otherwise, read a character (call it \emph{y}), and
 perform one of the following actions according to its syntactic type:
 \label{READER-PLAIN-TOKEN}
 
-\item (В данной точке начинается запись токена, и FIXME ) Если конец файла, перейти к
-  шагу~\ref{READER-TOKEN-END}.  Иначе прочесть символ (назвать его
-  \emph{y}), и выполнить одно из следующих действий в зависимости от
-  синтаксического типа:
-\label{READER-PLAIN-TOKEN}
 \begin{itemize}
 \item
 If \emph{y} is a \emph{constituent} or \emph{non-terminating macro},
@@ -515,15 +285,6 @@ The case of \emph{y\/} should not be altered; instead,
 
 Append \emph{y} to the token being built,
 and repeat step~\ref{READER-PLAIN-TOKEN}.
-
-\item Если \emph{y} обычный или \emph{нетерминальный макросимвол},
-  тогда выполнить следующее.
-
-  Регистр \emph{y} не должен быть изменён, вместо этого \emph{y}
-  помечается как замещаемый.
-  
-  Добавить \emph{y} в конец записываемого токена и повторить
-  шаг~\ref{READER-PLAIN-TOKEN}.
 
 \item
 If \emph{y} is a \emph{single escape} character, then read the next character
@@ -538,38 +299,17 @@ For the purposes of \cdf{readtable-case}, \emph{z} is not replaceable.
 Append \emph{z} to the token being built,
 and repeat step~\ref{READER-PLAIN-TOKEN}.
 
-\item Если \emph{y} является \emph{одинарным экранирующим символом},
-  тогда прочесть следующий символ и назвать его \emph{z} (но если это
-  конец файла, сигнализировать ошибку).  Игнорировать обычный
-  синтаксис \emph{z} и трактовать его как \emph{обычный} символ, а
-  которого только \emph{алфавитный} атрибут.
-
-  В целях функции \cdf{readtable-case}, \emph{z} не является замещаемым.
-
-  Добавить \emph{z} в конец записываемого токена и повторить
-  шаг~\ref{READER-PLAIN-TOKEN}.
-
 \item
 If \emph{y} is a \emph{multiple escape} character,
 then go to step~\ref{READER-MULTI-TOKEN}.
 
-\item Если \emph{y} это \emph{много экранирующий символ}, тогда
-  перейти к шагу~\ref{READER-MULTI-TOKEN}.
-
 \item
 If \emph{y} is an \emph{illegal} character, signal an error.
-
-\item Если \emph{y} это \emph{некорректный символ}, сигнализировать
-  ошибку.
 
 \item
 If \emph{y} is a \emph{terminating macro} character, it terminates
 the token.  First ``unread'' the character \emph{y}
 (see \cdf{unread-char}), then go to step~\ref{READER-TOKEN-END}.
-
-\item Если \emph{y} это \emph{терминальный макросимвол}, он завершает
-  запись токена. Сначала <<отменить>> чтение символа \emph{y}
-  (смотрите \cdf{unread-char}), затем перейти к шагу~\ref{READER-TOKEN-END}.
 
 \item
 If \emph{y} is a \emph{whitespace} character, it terminates
@@ -577,10 +317,6 @@ the token.  First ``unread'' \emph{y}
 if appropriate (see \cdf{read-preserving-whitespace}),
 then go to step~\ref{READER-TOKEN-END}.
 
-\item Если \emph{y} это \emph{пробел}, он завершает запись
-  токена. Сначала, если необходимо (смотрите
-  \cdf{read-preserving-whitespace}) <<отменить>> чтение \emph{y},
-  затем перейти к шагу~\ref{READER-TOKEN-END}.
 \end{itemize}
 
 \item
@@ -591,11 +327,6 @@ Otherwise, read a character (call it \emph{y}), and
 perform one of the following actions according to its syntactic type:
 \label{READER-MULTI-TOKEN}
 
-\item (В данной точке начинается запись токена, и FIXME ) Если конец
-  файла, сигнализировать ошибку. Иначе прочесть символ (назвать его
-  \emph{y}), и выполнить одно из следующих действий в зависимости от
-  синтаксического типа:
-\label{READER-MULTI-TOKEN}
 \begin{itemize}
 \item
 If \emph{y} is a \emph{constituent}, \emph{macro}, or \emph{whitespace}
@@ -608,11 +339,6 @@ For the purposes of \cdf{readtable-case}, \emph{y} is not replaceable.
 Append \emph{y} to the token being built,
 and repeat step~\ref{READER-MULTI-TOKEN}.
 
-\item Если \emph{y} \emph{обычный}, \emph{макросимвол} или
-  \emph{пробел}, тогда игнорировать обычный синтаксис данного символа
-  и трактовать его как \emph{обычный}, у которого есть только
-  \emph{алфавитный} атрибут.
-
 \item
 If \emph{y} is a \emph{single escape} character, then read the next character
 and call it \emph{z}
@@ -626,28 +352,13 @@ For the purposes of \cdf{readtable-case}, \emph{z} is not replaceable.
 Append \emph{z} to the token being built,
 and repeat step~\ref{READER-MULTI-TOKEN}.
 
-\item Если \emph{y} \emph{одинарный экранирующий символ}, тогда
-  прочесть следующий символ и назвать его \emph{z} (но если конец
-  файла, сигнализировать ошибку). Игнорировать обычный синтаксис
-  \emph{z} и трактовать его как \emph{обычный} символ, у которого
-  только \emph{алфавитный атрибут}.
-
-  Для функции \cdf{readtable-case} \emph{z} незамещаемый.
-
-  Добавить \emph{z} в конец записываемого токена и повторить
-  шаг~\ref{READER-MULTI-TOKEN}.
-
 \item
 If \emph{y} is a \emph{multiple escape} character,
 then go to step~\ref{READER-PLAIN-TOKEN}.
 
-\item Если \emph{y} \emph{много экранирующий символ}, тогда перейти к
-  шагу~\ref{READER-PLAIN-TOKEN}.
-
 \item
 If \emph{y} is an \emph{illegal} character, signal an error.
 
-\item Если \emph{y} \emph{некорректный символ}, сигнализировать ошибку.
 \end{itemize}
 
 \item
@@ -673,16 +384,6 @@ It is implementation-dependent which attributes are removed.
 \end{newer}
 \label{READER-TOKEN-END}
 
-\item Данный токен был записан.  Если записанный токен трактуется как
-  символ, в данной точке, если указано в слоте \cdf{readtable-case}
-  текущей таблицы чтения из переменной \cdf{*readtable*}, все
-  заменяемые символы должны быть возведены в верхний регистр.
-
-  Интерпретировать токен как представление Lisp'ового объекта и
-  вернуть этот объект в качестве результата операции чтения, или
-  сигнализировать ошибку, если у токена некорректный синтаксис.
-\label{READER-TOKEN-END}
-
 \end{enumerate}
 \endgroup
 
@@ -691,29 +392,14 @@ serves to cause the following character to be treated as a simple alphabetic
 character.  A \emph{single escape} character can be included in a token only
 if preceded by another \emph{single escape} character.
 
-Как правило. \emph{одинарный экранирующий символ} никогда не стоит сам
-по себе, а всегда указывает, что следующий символ нужно трактовать,
-как \emph{обычный алфавитный символ}. \emph{Одинарный экранирующий
-  символ} можно включить в токен только с помощью другого
-\emph{одинарного экранирующего символа}.
-
 A \emph{multiple escape} character also never stands for itself.  The characters
 between a pair of \emph{multiple escape} characters are all treated as
 simple alphabetic characters, except that \emph{single escape} and
 \emph{multiple escape} characters must nevertheless be preceded by
 a \emph{single escape} character to be included.
 
-\emph{Много экранирующий символ} также никогда не стоит сам по
-себе. Все символы между парой \emph{много экранирующих символов}
-трактуются как \emph{обычный алфавитные символы}, за исключением
-\emph{одинарного экранирующего символа}, и \emph{много экранирующий
-  символ} FIXME
-
 \subsection{Parsing of Numbers and Symbols}
 \label{PARSE-TOKENS-SECTION}
-
-%\subsection{Считывание чисел и символов}
-%\label{PARSE-TOKENS-SECTION}
 
 When an extended token is read, it is interpreted as a number or symbol.
 In general, the token is interpreted as a number if it satisfies
@@ -843,75 +529,6 @@ for future extensions.)
 \cd{|}&\emph{alphabetic} *&\cdf{X}, \cdf{x}&\emph{alphadigit} \\
 \cd{{\Xrbrace}}&\emph{alphabetic}&\cdf{Y}, \cdf{y}&\emph{alphadigit} \\
 \cd{{\Xtilde}}&\emph{alphabetic}&\cdf{Z}, \cdf{z}&\emph{alphadigit} \\
-\end{tabular*}
-
-\vfill
-\begin{footnotesize}
-\noindent
-These interpretations apply only to characters whose
-syntactic type is \emph{constituent}.  Entries marked
-with an asterisk are normally shadowed because the characters
-are of syntactic type
-\emph{whitespace}, \emph{macro}, \emph{single escape}, or \emph{multiple escape}.
-An \emph{alphadigit} character is interpreted as a
-digit if it is a valid digit in the radix specified by {\small \cd{*read-base*}};
-otherwise it is alphabetic.
-Characters with an \emph{illegal} attribute can never appear in
-a token except under the control of an escape character.
-\end{footnotesize}
-\end{table}
-
-\begin{table}
-\caption{Свойства стандартных символов}
-\label{Standard-Readtable-Attributes-Table}
-
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l@{\extracolsep{\fill}}lllll@{}}
-\cd{!}&\emph{алфавитный}&$\langle$page$\rangle$&\emph{недопустимый}&$\langle$backspace$\rangle$&\emph{недопустимый} \\
-\cd{"}&\emph{алфавитный} *&$\langle$return$\rangle$&\emph{недопустимый} *&$\langle$tab$\rangle$&\emph{недопустимый} * \\
-\cd{\#}&\emph{алфавитный} *&$\langle$space$\rangle$&\emph{недопустимый} *&$\langle$newline$\rangle$&\emph{недопустимый} * \\
-\cd{\$}&\emph{алфавитный}&$\langle$rubout$\rangle$&\emph{недопустимый}&$\langle$linefeed$\rangle$&\emph{недопустимый} * \\
-\cd{\%}&\emph{алфавитный}&\cd{.}&\multicolumn{3}{l}{\emph{алфавитный},
-  \emph{точка}, \emph{разделитель десятичной части}}\\
-\cd{\&}&\emph{алфавитный}&\cdf{+}&\multicolumn{3}{l}{\emph{алфавитный},
-  \emph{знак плюс}} \\
-\cd{'}&\emph{алфавитный} *&\cdf{-}&\multicolumn{3}{l}{\emph{алфавитный},
-  \emph{знак минус}} \\
-\cd{(}&\emph{алфавитный} *&\cdf{*}&\emph{алфавитный} \\
-\cd{)}&\emph{алфавитный} *&\cdf{/}&\multicolumn{3}{l}{\emph{алфавитный},
-  \emph{маркер дроби}} \\
-\cd{,}&\emph{алфавитный} *&\cd{{\Xatsign}}&\emph{алфавитный} \\
-\cd{0}&\emph{алфавитно-цифровой}&\cdf{A}, \cdf{a}&\emph{алфавитно-цифровой} \\
-\cd{1}&\emph{алфавитно-цифровой}&\cdf{B}, \cdf{b}&\emph{алфавитно-цифровой} \\
-\cd{2}&\emph{алфавитно-цифровой}&\cdf{C}, \cdf{c}&\emph{алфавитно-цифровой} \\
-\cd{3}&\emph{алфавитно-цифровой}&\cdf{D}, \cdf{d}&\multicolumn{3}{l}{\emph{алфавитно-цифровой}, \emph{маркер экспоненты
-    для двойного с плавающей точкой}} \\
-\cd{4}&\emph{алфавитно-цифровой}&\cdf{E}, \cdf{e}&\multicolumn{3}{l}{\emph{алфавитно-цифровой}, \emph{маркер экспоненты
-    для числа с плавающей точкой}} \\
-\cd{5}&\emph{алфавитно-цифровой}&\cdf{F}, \cdf{f}&\multicolumn{3}{l}{\emph{алфавитно-цифровой}, \emph{маркер экспоненты
-    для одинарного с плавающей точкой}} \\
-\cd{6}&\emph{алфавитно-цифровой}&\cdf{G}, \cdf{g}&\emph{алфавитно-цифровой} \\
-\cd{7}&\emph{алфавитно-цифровой}&\cdf{H}, \cdf{h}&\emph{алфавитно-цифровой} \\
-\cd{8}&\emph{алфавитно-цифровой}&\cdf{I}, \cdf{i}&\emph{алфавитно-цифровой} \\
-\cd{9}&\emph{алфавитно-цифровой}&\cdf{J}, \cdf{j}&\emph{алфавитно-цифровой} \\
-\cd{:}&\emph{package marker}~~~~~~&\cdf{K}, \cdf{k}&\emph{алфавитно-цифровой} \\
-\cd{;}&\emph{алфавитный} *&\cdf{L}, \cdf{l}&\multicolumn{3}{l}{\emph{алфавитно-цифровой}, \emph{маркер экспоненты
-    для длинного с плавающей точкой}} \\
-\cdf{<}&\emph{алфавитный}&\cdf{M}, \cdf{m}&\emph{алфавитно-цифровой} \\
-\cdf{=}&\emph{алфавитный}&\cdf{N}, \cdf{n}&\emph{алфавитно-цифровой} \\
-\cdf{>}&\emph{алфавитный}&\cdf{O}, \cdf{o}&\emph{алфавитно-цифровой} \\
-\cd{?}&\emph{алфавитный}&\cdf{P}, \cdf{p}&\emph{алфавитно-цифровой} \\
-\cd{{\Xlbracket}}&\emph{алфавитный}&\cdf{Q}, \cdf{q}&\emph{алфавитно-цифровой} \\
-\cd{{\Xbackslash}}&\emph{алфавитный} *&\cdf{R}, \cdf{r}&\emph{алфавитно-цифровой} \\
-\cd{{\Xrbracket}}&\emph{алфавитный}&\cdf{S},
-\cdf{s}&\multicolumn{3}{l}{\emph{алфавитно-цифровой}, \emph{маркер экспоненты
-    для короткого с плавающей точкой}} \\
-\cd{{\Xcircumflex}}&\emph{алфавитный}&\cdf{T}, \cdf{t}&\emph{алфавитно-цифровой} \\
-\cd{{\Xunderscore}}&\emph{алфавитный}&\cdf{U}, \cdf{u}&\emph{алфавитно-цифровой} \\
-\cd{{\Xbq}}&\emph{алфавитный} *&\cdf{V}, \cdf{v}&\emph{алфавитно-цифровой} \\
-\cd{{\Xlbrace}}&\emph{алфавитный}&\cdf{W}, \cdf{w}&\emph{алфавитно-цифровой} \\
-\cd{|}&\emph{алфавитный} *&\cdf{X}, \cdf{x}&\emph{алфавитно-цифровой} \\
-\cd{{\Xrbrace}}&\emph{алфавитный}&\cdf{Y}, \cdf{y}&\emph{алфавитно-цифровой} \\
-\cd{{\Xtilde}}&\emph{алфавитный}&\cdf{Z}, \cdf{z}&\emph{алфавитно-цифровой} \\
 \end{tabular*}
 
 \vfill
