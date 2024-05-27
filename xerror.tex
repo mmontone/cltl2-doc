@@ -3,7 +3,7 @@
 
 \clearpage\def\pagestatus{FINAL PROOF}
 
-\chapter{Errors Ошибки}
+\chapter{Errors}
 \label{XERROR}
 
 Errors may be signaled for a variety of reasons.
@@ -11,11 +11,6 @@ Many built-in Common Lisp functions may signal an error when given incorrect
 arguments.  Other functions, described in this chapter,
 may be called by user programs for the purpose of signaling
 an error.
-
-По разным причинам могут быть сигнализированы ошибки.
-Многие встроенные Common Lisp'овые функции, когда получают некорректные
-аргументы, могут сигнализировать ошибку. Другие функции, описанные в этой главе,
-могут быть использованы пользователем в целях сигнализирования ошибки.
 
 When an error is signaled, it is
 handled in an implementation-dependent way.  It is expected
@@ -27,16 +22,6 @@ ways, including abandoning the current computation (``aborting to top
 level'') and continuing from the error.  What ``continuing'' means
 depends on how the error is signaled; the details of this are specified below
 for each error-signaling function.
-
-Когда сигнализируется ошибка, она обрабатывается способом, зависимым от
-реализации. Ожидается, что каждая реализация Common Lisp'а предоставляет
-интерактивный отладчик, который выводит сообщение об ошибке с дополнительной
-информацией, такой как, например, функция вызывавшая ошибку. Пользователь может
-взаимодействовать с отладчиком, рассматривая и модифицируя различными способами
-состояние программы, включая отмену текущих вычислений (<<возврат на верхний
-уровень>>) и продолжение после ошибки. Что означает <<продолжение>> зависит от
-того, как была сигнализирована ошибка. Эти детали указаны ниже для каждой
-функции, создающией сигналы ошибок.
 
 \begin{newer}
 X3J13 voted in June 1988
@@ -58,9 +43,6 @@ See chapter~\ref{CONDITION}.
 The functions in this section provide various mechanisms
 for signaling warnings, breaks, continuable errors, and fatal errors.
 
-Функции в данном разделе предоставляют различные механизмы для сигнализирования
-предупреждений, прерываний, исправимых ошибок, и неисправивым (fatal) ошибок.
-
 In each case, the caller specifies an error message (a string) that may be
 processed (and perhaps displayed to the user) by the error-handling
 mechanism.  All messages are
@@ -68,20 +50,10 @@ constructed by applying the function
 \cdf{format} to the quantities {\nil}, \emph{format-string},
 and all the \emph{args} to produce a string.
 
-В каждом случае, вызывающий код указывает сообщение ошибки (строка), которая
-может быть обработана (и, возможно, показана пользователю) с помощью механизма
-обработки ошибок. Все сообщения создаются с помощью применения функции
-\cdf{format} к аргументам {\nil}, \emph{format-string} и всем параметрам
-\emph{args}.
-
 An error message string should not contain a newline character
 at either the beginning or end, and should not contain any sort of
 herald indicating that it is an error.  The system will take care of
 these according to whatever its preferred style may be.  
-
-Строка ошибка не должна содержать символов новой строки ни в начале, ни в конце,
-и не должна содержать информацию о том, что это ошибка. Система позаботится об
-этом в своем стиле.
 
 Conventionally,
 error messages are complete English sentences ending with a period.
