@@ -1,4 +1,4 @@
-* Common Lisp The Laguage Second Edition by Guy Steel
+* Common Lisp The Laguage Second Edition by Guy Steele
 
 with some corrections from: http://bc.tech.coop/cltl2-ansi.htm
 
