@@ -1,4 +1,4 @@
-* Common Lisp The Laguage Second Edition by Guy Steele
+* Common Lisp the Language, 2nd Edition
 
 with some corrections from: http://bc.tech.coop/cltl2-ansi.htm
 
@@ -8,7 +8,7 @@ https://github.com/mmontone/cltl2-doc/releases/latest
 
 * Compilation
 
-Run `make`
+Run =make=
 
 * About
 
