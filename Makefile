@@ -9,6 +9,8 @@ enpdf/cltl2.pdf:
 
 # make pdf
 	pdflatex -file-line-error -output-directory enpdf "\input{clm}"
+# twice for links to be rendered?
+	pdflatex -file-line-error -output-directory enpdf "\input{clm}"
 
 	mv enpdf/clm.pdf enpdf/cltl2.pdf
 
